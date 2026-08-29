@@ -1,7 +1,10 @@
 import { z } from "zod";
 
 export const loginSchema = z.object({
-  email: z.email(),
+  uid: z
+    .string()
+    .min(1, "UID is required")
+    .regex(/^UID\d+$/, "UID must be in format UID followed by numbers (e.g. UID1)"),
   password: z.string().min(1, "Password is required"),
 });
 

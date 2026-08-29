@@ -1,15 +1,10 @@
 import { create } from "zustand";
-
-export interface User {
-  id: string;
-  email: string;
-  name?: string;
-}
+import type { AuthUser } from "@/features/auth/types";
 
 interface AuthState {
-  user: User | null;
+  user: AuthUser | null;
   isAuthenticated: boolean;
-  setUser: (user: User) => void;
+  setUser: (user: AuthUser) => void;
   clearAuth: () => void;
 }
 

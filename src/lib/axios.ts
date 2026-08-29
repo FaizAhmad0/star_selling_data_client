@@ -1,27 +1,15 @@
 import axios from "axios";
-import type { AxiosError, AxiosRequestConfig, InternalAxiosRequestConfig } from "axios";
+import type { AxiosError, AxiosRequestConfig } from "axios";
 import type { ApiError } from "@/types/api";
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
   timeout: 15000,
+  withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },
 });
-
-api.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
-    // Attach auth token here when authentication is implemented.
-    // Example:
-    // const token = getAuthToken();
-    // if (token) {
-    //   config.headers.Authorization = `Bearer ${token}`;
-    // }
-    return config;
-  },
-  (error) => Promise.reject(error),
-);
 
 api.interceptors.response.use(
   (response) => response,
