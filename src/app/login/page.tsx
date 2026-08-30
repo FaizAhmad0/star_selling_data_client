@@ -11,9 +11,19 @@ import type { OtpInput } from "@/features/auth/schemas/otp.schema";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 
+function redirectByRole(role: string, router: ReturnType<typeof useRouter>) {
+  switch (role) {
+    case "admin": router.push("/admin"); break;
+    case "manager": router.push("/manager"); break;
+    case "accountant": router.push("/accountant"); break;
+    case "supervisor": router.push("/supervisor"); break;
+    default: router.push("/dashboard"); break;
+  }
+}
+
 export default function LoginPage() {
   const router = useRouter();
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, user } = useAuthStore();
   const [view, setView] = useState<"login" | "otp">("login");
   const [pendingUid, setPendingUid] = useState("");
   const [expiresIn, setExpiresIn] = useState(300);
@@ -22,10 +32,10 @@ export default function LoginPage() {
   const otpMutation = useVerifyOtp();
 
   useEffect(() => {
-    if (isAuthenticated) {
-      router.push("/dashboard");
+    if (isAuthenticated && user) {
+      redirectByRole(user.role, router);
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, user, router]);
 
   useEffect(() => {
     if (view !== "otp") return;
@@ -40,24 +50,26 @@ export default function LoginPage() {
 
   const handleLogin = useCallback(
     (data: LoginInput) => {
-      loginMutation.mutate(data, {
-        onSuccess: (response) => {
-          if (response.requiresOtp) {
-            setPendingUid(data.uid);
-            setExpiresIn(300);
-            setView("otp");
-          }
-        },
+      loginMutation.mutateAsync(data).then((response) => {
+        if ("requiresOtp" in response.data) {
+          setPendingUid(data.uid);
+          setExpiresIn(300);
+          setView("otp");
+        } else {
+          redirectByRole(response.data.role, router);
+        }
       });
     },
-    [loginMutation],
+    [loginMutation, router],
   );
 
   const handleVerifyOtp = useCallback(
     (data: OtpInput) => {
-      otpMutation.mutate({ uid: pendingUid, otp: data.otp });
+      otpMutation.mutateAsync({ uid: pendingUid, otp: data.otp }).then((response) => {
+        redirectByRole(response.data.role, router);
+      });
     },
-    [otpMutation, pendingUid],
+    [otpMutation, pendingUid, router],
   );
 
   const handleBackToLogin = () => {

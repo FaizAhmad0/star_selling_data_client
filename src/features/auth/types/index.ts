@@ -13,8 +13,7 @@ export interface AuthUser {
 export interface LoginResponse {
   success: boolean;
   message: string;
-  requiresOtp?: boolean;
-  data: AuthUser;
+  data: AuthUser | { requiresOtp: true; uid: number };
 }
 
 export interface OtpResponse {
