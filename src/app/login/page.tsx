@@ -137,7 +137,7 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={handleBackToLogin}
-                className="w-full text-center text-sm text-muted-foreground transition-colors hover:text-foreground"
+                className="w-full cursor-pointer text-center text-sm text-muted-foreground transition-colors hover:text-foreground"
               >
                 Back to login
               </button>
@@ -147,7 +147,7 @@ export default function LoginPage() {
             By continuing, you agree to our{" "}
             <a
               href="/privacy-policy"
-              className="text-foreground underline underline-offset-2 transition-colors hover:text-primary"
+              className="cursor-pointer text-foreground underline underline-offset-2 transition-colors hover:text-primary"
             >
               Privacy Policy
             </a>
