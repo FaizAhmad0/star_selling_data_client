@@ -53,7 +53,7 @@ export function DashboardSidebar({
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-3 top-3 inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-border bg-background text-muted-foreground shadow-sm transition hover:text-foreground lg:hidden"
+          className="absolute right-3 flex h-10 w-10 items-center justify-center rounded-2xl border border-border bg-background text-muted-foreground shadow-sm transition hover:text-foreground lg:hidden"
           aria-label="Close sidebar menu"
         >
           <X className="h-5 w-5" />
