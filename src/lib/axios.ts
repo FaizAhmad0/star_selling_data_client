@@ -2,6 +2,12 @@ import axios from "axios";
 import type { AxiosError, AxiosRequestConfig } from "axios";
 import type { ApiError } from "@/types/api";
 
+function getCsrfToken(): string | null {
+  if (typeof document === "undefined") return null;
+  const match = document.cookie.match(/csrf_token=([^;]+)/);
+  return match ? match[1] : null;
+}
+
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
   timeout: 15000,
@@ -9,6 +15,17 @@ const api = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
+});
+
+api.interceptors.request.use((config) => {
+  const method = config.method?.toUpperCase();
+  if (method && method !== "GET" && method !== "HEAD" && method !== "OPTIONS") {
+    const token = getCsrfToken();
+    if (token) {
+      config.headers["X-CSRF-Token"] = token;
+    }
+  }
+  return config;
 });
 
 api.interceptors.response.use(
