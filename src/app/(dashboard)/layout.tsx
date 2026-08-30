@@ -1,21 +1,53 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "@/stores/auth-store";
 import { useCurrentUser } from "@/features/auth/hooks/use-auth";
 import { Loading } from "@/components/shared/loading";
 
+const ROLE_ROUTES: Record<string, string[]> = {
+  admin: ["/admin"],
+  manager: ["/manager"],
+  supervisor: ["/supervisor"],
+  accountant: ["/accountant"],
+  user: ["/dashboard"],
+};
+
+const ROLE_DASHBOARD: Record<string, string> = {
+  admin: "/admin",
+  manager: "/manager",
+  supervisor: "/supervisor",
+  accountant: "/accountant",
+  user: "/dashboard",
+};
+
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const { isAuthenticated } = useAuthStore();
+  const pathname = usePathname();
+  const { isAuthenticated, user } = useAuthStore();
   const { isLoading } = useCurrentUser();
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
+    if (isLoading) return;
+
+    if (!isAuthenticated) {
       router.push("/login");
+      return;
     }
-  }, [isLoading, isAuthenticated, router]);
+
+    if (user) {
+      const allowedRoutes = ROLE_ROUTES[user.role] ?? ["/dashboard"];
+      const isAllowed = allowedRoutes.some(
+        (route) => pathname === route || pathname.startsWith(route + "/"),
+      );
+
+      if (!isAllowed) {
+        const dashboard = ROLE_DASHBOARD[user.role] ?? "/dashboard";
+        router.push(dashboard);
+      }
+    }
+  }, [isLoading, isAuthenticated, user, pathname, router]);
 
   if (isLoading) {
     return (
@@ -25,7 +57,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     );
   }
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated || !user) {
+    return null;
+  }
+
+  const allowedRoutes = ROLE_ROUTES[user.role] ?? ["/dashboard"];
+  const isAllowed = allowedRoutes.some(
+    (route) => pathname === route || pathname.startsWith(route + "/"),
+  );
+
+  if (!isAllowed) {
     return null;
   }
 
