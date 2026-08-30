@@ -10,7 +10,7 @@ export default function SupervisorPage() {
   const logoutMutation = useLogout();
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-muted/30 p-4">
+    <div className="flex flex-col items-center justify-center p-4">
       <Card className="w-full max-w-lg">
         <CardHeader>
           <CardTitle className="text-2xl">Supervisor Dashboard</CardTitle>
