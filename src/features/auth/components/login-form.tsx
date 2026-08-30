@@ -30,13 +30,9 @@ export function LoginForm({ onSubmit, isLoading }: LoginFormProps) {
       <div className="space-y-2">
         <Label htmlFor="uid">UID</Label>
         <div className="flex">
-          <span className="flex items-center rounded-l-md border border-r-0 border-input bg-muted px-3 text-sm font-medium text-muted-foreground">
-            UID
-          </span>
           <Input
             id="uid"
-            placeholder="1"
-            className="rounded-l-none"
+            placeholder="Enter your UID"
             disabled={isLoading}
             {...register("uid", {
               setValueAs: (value) => {
@@ -47,7 +43,9 @@ export function LoginForm({ onSubmit, isLoading }: LoginFormProps) {
             })}
           />
         </div>
-        {errors.uid && <p className="text-sm text-destructive">{errors.uid.message}</p>}
+        {errors.uid && (
+          <p className="text-sm text-destructive">{errors.uid.message}</p>
+        )}
       </div>
 
       <div className="space-y-2">
@@ -70,7 +68,9 @@ export function LoginForm({ onSubmit, isLoading }: LoginFormProps) {
             {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
           </button>
         </div>
-        {errors.password && <p className="text-sm text-destructive">{errors.password.message}</p>}
+        {errors.password && (
+          <p className="text-sm text-destructive">{errors.password.message}</p>
+        )}
       </div>
 
       <Button type="submit" className="w-full" disabled={isLoading}>
