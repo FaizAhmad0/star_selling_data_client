@@ -26,30 +26,27 @@ export function LoginForm({ onSubmit, isLoading }: LoginFormProps) {
   });
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <div className="space-y-2">
-        <Label htmlFor="uid">UID</Label>
-        <div className="flex">
-          <Input
-            id="uid"
-            placeholder="Enter your UID"
-            disabled={isLoading}
-            {...register("uid", {
-              setValueAs: (value) => {
-                if (!value) return value;
-                const clean = value.replace(/[^0-9]/g, "");
-                return clean ? `UID${clean}` : "";
-              },
-            })}
-          />
-        </div>
+        <Input
+          id="uid"
+          placeholder="Enter your UID"
+          disabled={isLoading}
+          className="h-10 text-sm"
+          {...register("uid", {
+            setValueAs: (value) => {
+              if (!value) return value;
+              const clean = value.replace(/[^0-9]/g, "");
+              return clean ? `UID${clean}` : "";
+            },
+          })}
+        />
         {errors.uid && (
           <p className="text-sm text-destructive">{errors.uid.message}</p>
         )}
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="password">Password</Label>
         <div className="relative">
           <Input
             id="password"
@@ -57,12 +54,13 @@ export function LoginForm({ onSubmit, isLoading }: LoginFormProps) {
             placeholder="Enter your password"
             autoComplete="current-password"
             disabled={isLoading}
+            className="h-10 pr-10 text-sm"
             {...register("password")}
           />
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
             tabIndex={-1}
           >
             {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -73,7 +71,11 @@ export function LoginForm({ onSubmit, isLoading }: LoginFormProps) {
         )}
       </div>
 
-      <Button type="submit" className="w-full" disabled={isLoading}>
+      <Button
+        type="submit"
+        className="h-10 w-full text-sm font-medium"
+        disabled={isLoading}
+      >
         {isLoading ? (
           <>
             <Loader2 className="mr-2 size-4 animate-spin" />

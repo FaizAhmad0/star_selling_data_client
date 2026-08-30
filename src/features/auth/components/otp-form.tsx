@@ -77,15 +77,18 @@ export function OtpForm({ onSubmit, isLoading, expiresIn }: OtpFormProps) {
 
   const minutes = Math.floor(expiresIn / 60);
   const seconds = expiresIn % 60;
+  const isExpired = expiresIn <= 0;
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-      <div className="space-y-2">
-        <div className="flex justify-center gap-2">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <div className="space-y-3">
+        <div className="flex justify-center gap-2.5 sm:gap-3">
           {otpValues.map((value, index) => (
             <Input
               key={index}
-              ref={(el) => { inputRefs.current[index] = el; }}
+              ref={(el) => {
+                inputRefs.current[index] = el;
+              }}
               type="text"
               inputMode="numeric"
               maxLength={1}
@@ -93,30 +96,42 @@ export function OtpForm({ onSubmit, isLoading, expiresIn }: OtpFormProps) {
               onChange={(e) => handleChange(index, e.target.value)}
               onKeyDown={(e) => handleKeyDown(index, e)}
               onPaste={handlePaste}
-              className="h-12 w-12 text-center text-lg font-medium"
+              className="h-12 w-11 text-center text-lg font-semibold sm:h-14 sm:w-12 sm:text-xl"
               disabled={isLoading}
             />
           ))}
         </div>
         {errors.otp && (
-          <p className="text-center text-sm text-destructive">{errors.otp.message}</p>
+          <p className="text-center text-sm text-destructive">
+            {errors.otp.message}
+          </p>
         )}
       </div>
 
-      <div className="text-center text-sm text-muted-foreground">
-        {expiresIn > 0 ? (
-          <p>
-            OTP expires in{" "}
-            <span className="font-medium text-foreground">
+      <div className="text-center">
+        {isExpired ? (
+          <p className="text-sm text-destructive">
+            Code has expired. Please sign in again.
+          </p>
+        ) : (
+          <p className="text-sm text-muted-foreground">
+            Code expires in{" "}
+            <span
+              className={`font-medium tabular-nums ${
+                expiresIn <= 60 ? "text-destructive" : "text-foreground"
+              }`}
+            >
               {minutes}:{seconds.toString().padStart(2, "0")}
             </span>
           </p>
-        ) : (
-          <p className="text-destructive">OTP has expired. Please login again.</p>
         )}
       </div>
 
-      <Button type="submit" className="w-full" disabled={isLoading || expiresIn <= 0}>
+      <Button
+        type="submit"
+        className="h-10 w-full text-sm font-medium"
+        disabled={isLoading || isExpired}
+      >
         {isLoading ? (
           <>
             <Loader2 className="mr-2 size-4 animate-spin" />
