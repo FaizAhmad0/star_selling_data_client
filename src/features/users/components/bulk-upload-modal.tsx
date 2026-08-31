@@ -106,12 +106,15 @@ export function BulkUploadModal({ open, onClose }: BulkUploadModalProps) {
 
   const handleUpload = () => {
     if (!validation || validation.valid.length === 0) return;
-    bulkCreate.mutate(validation.valid, {
-      onSuccess: () => {
-        resetState();
-        onClose();
-      },
-    });
+    bulkCreate.mutate(
+      { data: validation.valid, failedValidations: validation.invalid },
+      {
+        onSuccess: () => {
+          resetState();
+          onClose();
+        },
+      }
+    );
   };
 
   const resetState = () => {

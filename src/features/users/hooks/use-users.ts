@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import * as XLSX from "xlsx";
 import {
   getUsers,
   createUser,
@@ -7,7 +8,7 @@ import {
   deleteUser,
   bulkCreateUsers,
 } from "@/features/users/api/users.api";
-import type { UserQueryParams, CreateUserInput, UpdateUserInput } from "@/features/users/types";
+import type { UserQueryParams, CreateUserInput, UpdateUserInput, BulkUploadResult } from "@/features/users/types";
 
 export function useUsers(params: UserQueryParams = {}) {
   return useQuery({
@@ -31,10 +32,47 @@ export function useCreateUser() {
   });
 }
 
+function downloadBulkUploadReport(result: BulkUploadResult, failedValidations: { row: number; reason: string }[]) {
+  const workbook = XLSX.utils.book_new();
+
+  if (result.skipped.length > 0) {
+    const skippedData = result.skipped.map((s) => ({
+      Enrollment: s.enrollment,
+      "Primary Contact": s.primaryContact,
+      Reason: s.reason,
+    }));
+    const sheet = XLSX.utils.json_to_sheet(skippedData);
+    XLSX.utils.book_append_sheet(workbook, sheet, "Skipped");
+  }
+
+  if (failedValidations.length > 0) {
+    const failedData = failedValidations.map((f) => ({
+      Row: f.row > 0 ? `Row ${f.row}` : "Header/File",
+      Reason: f.reason,
+    }));
+    const sheet = XLSX.utils.json_to_sheet(failedData);
+    XLSX.utils.book_append_sheet(workbook, sheet, "Failed Enrollments");
+  }
+
+  if (workbook.SheetNames.length === 0) return;
+
+  const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+  const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "bulk-upload-report.xlsx";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
 export function useBulkCreateUsers() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: CreateUserInput[]) => bulkCreateUsers(data),
+    mutationFn: ({ data, failedValidations }: { data: CreateUserInput[]; failedValidations: { row: number; reason: string }[] }) =>
+      bulkCreateUsers(data).then((response) => ({ ...response, failedValidations })),
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
       const { created, updated, skipped } = response.data;
@@ -43,6 +81,10 @@ export function useBulkCreateUsers() {
       if (updated.length) parts.push(`${updated.length} updated`);
       if (skipped.length) parts.push(`${skipped.length} skipped`);
       toast.success(`Bulk upload completed: ${parts.join(", ")}`);
+
+      if (skipped.length > 0 || response.failedValidations.length > 0) {
+        downloadBulkUploadReport(response.data, response.failedValidations);
+      }
     },
     onError: (error: { message: string }) => {
       toast.error(error.message || "Failed to upload users");
