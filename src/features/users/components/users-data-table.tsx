@@ -116,15 +116,15 @@ export function UsersTable({ users, meta, isLoading, onPageChange, onView, onEdi
       responsive: ["lg"],
       render: (_, record) => <span className="text-xs text-muted-foreground">{getBatch(record)}</span>,
     },
-    {
-      title: "Joining Date",
-      key: "joiningDate",
-      responsive: ["xl"],
-      render: (_, record) => {
-        const date = getJoiningDate(record);
-        return <span className="text-xs text-muted-foreground">{date !== "—" ? date : "—"}</span>;
-      },
-    },
+    // {
+    //   title: "Joining Date",
+    //   key: "joiningDate",
+    //   responsive: ["xl"],
+    //   render: (_, record) => {
+    //     const date = getJoiningDate(record);
+    //     return <span className="text-xs text-muted-foreground">{date !== "—" ? date : "—"}</span>;
+    //   },
+    // },
     {
       title: "Status",
       key: "status",
