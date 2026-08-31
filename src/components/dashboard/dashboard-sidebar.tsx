@@ -20,7 +20,10 @@ interface DashboardSidebarProps {
 }
 
 function isActivePath(pathname: string, href: string) {
-  return pathname === href || pathname.startsWith(href + "/");
+  if (href.split("/").length === 2) {
+    return pathname === href;
+  }
+  return pathname === href || pathname.startsWith(`${href}/`);
 }
 
 export function DashboardSidebar({
