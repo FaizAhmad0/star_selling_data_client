@@ -78,6 +78,20 @@ export function UsersTable({ users, meta, isLoading, onPageChange, onView, onEdi
       },
     },
     {
+      title: "UID",
+      dataIndex: "uid",
+      key: "uid",
+      responsive: ["sm"],
+      render: (val: number) => <span className="font-mono text-xs text-foreground">{val ? `UID${val}`: "—"}</span>,
+    },
+    {
+      title: "Password",
+      dataIndex: "password",
+      key: "password",
+      responsive: ["sm"],
+      render: (val: string) => <span className="font-mono text-xs text-foreground">{val || "—"}</span>,
+    },
+    {
       title: "Enrollment",
       key: "enrollment",
       responsive: ["sm"],
@@ -133,19 +147,19 @@ export function UsersTable({ users, meta, isLoading, onPageChange, onView, onEdi
     //     return <span className="text-xs text-muted-foreground">{date !== "—" ? date : "—"}</span>;
     //   },
     // },
-    {
-      title: "Status",
-      key: "status",
-      responsive: ["sm"],
-      render: (_, record) => {
-        const isActive = record.tokenVersion >= 0;
-        return (
-          <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${isActive ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400" : "bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400"}`}>
-            {isActive ? "Active" : "Inactive"}
-          </span>
-        );
-      },
-    },
+    // {
+    //   title: "Status",
+    //   key: "status",
+    //   responsive: ["sm"],
+    //   render: (_, record) => {
+    //     const isActive = record.tokenVersion >= 0;
+    //     return (
+    //       <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${isActive ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400" : "bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400"}`}>
+    //         {isActive ? "Active" : "Inactive"}
+    //       </span>
+    //     );
+    //   },
+    // },
     {
       title: "Actions",
       key: "actions",

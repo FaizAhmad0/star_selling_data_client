@@ -31,6 +31,7 @@ export interface User {
   dateWebsite?: string;
   dateEtsy?: string;
   platforms?: PlatformRef[];
+  password?: string;
   enrolledBy?: string;
   tokenVersion: number;
   createdAt: string;
