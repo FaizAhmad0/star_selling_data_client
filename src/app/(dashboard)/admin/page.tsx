@@ -151,7 +151,7 @@ export default function AdminPage() {
           </div>
 
           {/* Platform-specific sections */}
-          <div className="mt-6 space-y-4">
+          {/* <div className="mt-6 space-y-4">
             <h2 className="font-heading text-sm font-medium text-muted-foreground uppercase tracking-wider mb-3">
               Platform Users
             </h2>
@@ -236,7 +236,7 @@ export default function AdminPage() {
                 platform="website"
               />
             </div>
-          </div>
+          </div> */}
         </>
       ) : null}
     </div>
