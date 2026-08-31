@@ -74,6 +74,12 @@ export function ManagersTable({
       ),
     },
     {
+      title: "Password",
+      dataIndex: "password",
+      key: "password",
+      responsive: ["sm"],
+    },
+    {
       title: "Contact",
       dataIndex: "primaryContact",
       key: "primaryContact",
@@ -155,6 +161,7 @@ export function ManagersTable({
         <Table<Manager>
           columns={columns}
           dataSource={managers}
+          bordered
           rowKey="_id"
           loading={isLoading}
           pagination={{
