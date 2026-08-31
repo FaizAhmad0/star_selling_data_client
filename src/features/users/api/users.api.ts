@@ -17,6 +17,7 @@ function buildQueryString(params: UserQueryParams): string {
   if (params.batch) query.set("batch", params.batch);
   if (params.status) query.set("status", params.status);
   if (params.joiningDate) query.set("joiningDate", params.joiningDate);
+  if (params.platform) query.set("platform", params.platform);
   const str = query.toString();
   return str ? `?${str}` : "";
 }
