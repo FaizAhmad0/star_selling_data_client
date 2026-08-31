@@ -3,7 +3,7 @@
 import { Table, Tooltip, Button, Popconfirm, Space } from "antd";
 import type { TableProps } from "antd";
 import { EyeOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
-import type { User, ManagerRef } from "@/features/users/types";
+import type { User, ManagerRef, PlatformRef } from "@/features/users/types";
 
 function getManagerName(manager: ManagerRef | string | undefined): string {
   if (!manager) return "—";
@@ -25,6 +25,32 @@ function getJoiningDate(user: User): string {
 
 function getManager(user: User): string {
   return getManagerName(user.amazonManager || user.websiteManager || user.etsyManager);
+}
+
+function PlatformsCell({ platforms }: { platforms?: PlatformRef[] }) {
+  if (!platforms || platforms.length === 0) return <span className="text-xs text-muted-foreground">—</span>;
+
+  const maxVisible = 2;
+  const visible = platforms.slice(0, maxVisible);
+  const remaining = platforms.length - maxVisible;
+
+  return (
+    <div className="flex flex-wrap gap-1">
+      {visible.map((p) => (
+        <span
+          key={p._id}
+          className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary"
+        >
+          {p.name}
+        </span>
+      ))}
+      {remaining > 0 && (
+        <span className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">
+          +{remaining} more
+        </span>
+      )}
+    </div>
+  );
 }
 
 interface UsersTableProps {
@@ -71,6 +97,12 @@ export function UsersTable({ users, meta, isLoading, onPageChange, onView, onEdi
       key: "primaryContact",
       responsive: ["md"],
       render: (val: string) => <span className="text-xs text-muted-foreground">{val || "—"}</span>,
+    },
+    {
+      title: "Platforms",
+      key: "platforms",
+      responsive: ["lg"],
+      render: (_, record) => <PlatformsCell platforms={record.platforms} />,
     },
     {
       title: "Manager",
@@ -145,7 +177,7 @@ export function UsersTable({ users, meta, isLoading, onPageChange, onView, onEdi
           showTotal: (total, range) => `Showing ${range[0]}\u2013${range[1]} of ${total} users`,
           onChange: (page) => onPageChange(page),
         }}
-        scroll={{ x: 900 }}
+        scroll={{ x: 1000 }}
         size="middle"
       />
     </div>

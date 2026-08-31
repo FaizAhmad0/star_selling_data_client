@@ -4,6 +4,12 @@ export interface ManagerRef {
   email: string;
 }
 
+export interface PlatformRef {
+  _id: string;
+  name: string;
+  status: string;
+}
+
 export interface User {
   _id: string;
   uid: number;
@@ -24,6 +30,7 @@ export interface User {
   dateAmazon?: string;
   dateWebsite?: string;
   dateEtsy?: string;
+  platforms?: PlatformRef[];
   enrolledBy?: string;
   tokenVersion: number;
   createdAt: string;
@@ -65,6 +72,7 @@ export interface UpdateUserInput {
   name?: string;
   email?: string;
   primaryContact?: string;
+  platforms?: string[];
 }
 
 export interface UserQueryParams {
