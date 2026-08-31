@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Search, Plus, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,23 +11,42 @@ import { ManagersTable } from "@/features/managers/components/managers-data-tabl
 import { FilterPopover } from "@/features/managers/components/managers-filter";
 
 export default function AdminManagersPage() {
-  const [search, setSearch] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [page, setPage] = useState(1);
-  const [activeFilters, setActiveFilters] = useState<Record<string, string>>({});
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  const page = Number(searchParams.get("page")) || 1;
+  const search = searchParams.get("search") || "";
+  const status = searchParams.get("status") || "";
+
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout>>(null);
 
   const limit = 10;
 
-  const handleSearchChange = useCallback((value: string) => {
-    setSearch(value);
-    if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
-    debounceTimerRef.current = setTimeout(() => {
-      setDebouncedSearch(value);
-      setPage(1);
-    }, 400);
-  }, []);
+  const updateParams = useCallback(
+    (updates: Record<string, string>) => {
+      const params = new URLSearchParams(searchParams.toString());
+      Object.entries(updates).forEach(([key, value]) => {
+        if (value) {
+          params.set(key, value);
+        } else {
+          params.delete(key);
+        }
+      });
+      router.push(`?${params.toString()}`, { scroll: false });
+    },
+    [searchParams, router]
+  );
+
+  const handleSearchChange = useCallback(
+    (value: string) => {
+      if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+      debounceTimerRef.current = setTimeout(() => {
+        updateParams({ search: value, page: "1" });
+      }, 400);
+    },
+    [updateParams]
+  );
 
   useEffect(() => {
     return () => {
@@ -34,21 +54,29 @@ export default function AdminManagersPage() {
     };
   }, []);
 
-  const handleFilterChange = useCallback((key: string, value: string) => {
-    setActiveFilters((prev) => ({ ...prev, [key]: value }));
-    setPage(1);
-  }, []);
+  const handlePageChange = useCallback(
+    (newPage: number) => {
+      updateParams({ page: String(newPage) });
+    },
+    [updateParams]
+  );
+
+  const handleFilterChange = useCallback(
+    (key: string, value: string) => {
+      updateParams({ [key]: value, page: "1" });
+    },
+    [updateParams]
+  );
 
   const handleClearFilters = useCallback(() => {
-    setActiveFilters({});
-    setPage(1);
-  }, []);
+    updateParams({ status: "", page: "1" });
+  }, [updateParams]);
 
   const { data, isLoading, isError, refetch } = useManagers({
     page,
     limit,
-    search: debouncedSearch || undefined,
-    status: (activeFilters.status as "active" | "inactive") || undefined,
+    search: search || undefined,
+    status: (status as "active" | "inactive") || undefined,
   });
 
   const managers = data?.data?.data ?? [];
@@ -64,6 +92,9 @@ export default function AdminManagersPage() {
       ],
     },
   ];
+
+  const activeFilters: Record<string, string> = {};
+  if (status) activeFilters.status = status;
 
   if (isError) {
     return (
@@ -124,8 +155,9 @@ export default function AdminManagersPage() {
         <div className="relative w-full max-w-sm">
           <Search className="absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
           <Input
+            key={search}
             placeholder="Search by name, email, or phone..."
-            value={search}
+            defaultValue={search}
             onChange={(e) => handleSearchChange(e.target.value)}
             className="h-8 pl-8 text-xs"
           />
@@ -142,7 +174,7 @@ export default function AdminManagersPage() {
         managers={managers}
         meta={meta}
         isLoading={isLoading}
-        onPageChange={setPage}
+        onPageChange={handlePageChange}
       />
 
       <AddManagerModal

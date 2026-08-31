@@ -3,10 +3,16 @@ import { toast } from "sonner";
 import {
   getManagers,
   createManager,
+  updateManager,
+  changeManagerPassword,
   deleteManager,
   updateManagerStatus,
 } from "@/features/managers/api/managers.api";
-import type { ManagerQueryParams, CreateManagerInput } from "@/features/managers/types";
+import type {
+  ManagerQueryParams,
+  CreateManagerInput,
+  UpdateManagerInput,
+} from "@/features/managers/types";
 
 export function useManagers(params: ManagerQueryParams = {}) {
   return useQuery({
@@ -27,6 +33,38 @@ export function useCreateManager() {
     },
     onError: (error: { message: string }) => {
       toast.error(error.message || "Failed to create manager");
+    },
+  });
+}
+
+export function useUpdateManager() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateManagerInput }) =>
+      updateManager(id, data),
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: ["managers"] });
+      toast.success(response.message || "Manager updated successfully");
+    },
+    onError: (error: { message: string }) => {
+      toast.error(error.message || "Failed to update manager");
+    },
+  });
+}
+
+export function useChangeManagerPassword() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, password }: { id: string; password: string }) =>
+      changeManagerPassword(id, password),
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: ["managers"] });
+      toast.success(response.message || "Password updated successfully");
+    },
+    onError: (error: { message: string }) => {
+      toast.error(error.message || "Failed to update password");
     },
   });
 }

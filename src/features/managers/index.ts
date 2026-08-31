@@ -1,3 +1,3 @@
-export type { Manager, CreateManagerInput, ManagerQueryParams } from "./types";
+export type { Manager, CreateManagerInput, UpdateManagerInput, ManagerQueryParams } from "./types";
 export { createManagerSchema } from "./schemas/manager.schema";
 export type { CreateManagerFormInput } from "./schemas/manager.schema";

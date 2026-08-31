@@ -1,8 +1,9 @@
-import { apiGet, apiPost, apiPatch, apiDelete } from "@/lib/axios";
+import { apiGet, apiPost, apiPut, apiPatch, apiDelete } from "@/lib/axios";
 import type {
   ManagerListResponse,
   ManagerSingleResponse,
   CreateManagerInput,
+  UpdateManagerInput,
   ManagerQueryParams,
 } from "@/features/managers/types";
 
@@ -33,6 +34,20 @@ export async function createManager(
   data: CreateManagerInput
 ): Promise<ManagerSingleResponse> {
   return apiPost<ManagerSingleResponse>("/managers", data);
+}
+
+export async function updateManager(
+  id: string,
+  data: UpdateManagerInput
+): Promise<ManagerSingleResponse> {
+  return apiPut<ManagerSingleResponse>(`/managers/${id}`, data);
+}
+
+export async function changeManagerPassword(
+  id: string,
+  password: string
+): Promise<{ success: boolean; message: string }> {
+  return apiPatch(`/managers/${id}/password`, { password });
 }
 
 export async function updateManagerStatus(

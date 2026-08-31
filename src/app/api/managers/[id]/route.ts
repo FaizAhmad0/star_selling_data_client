@@ -18,7 +18,7 @@ export async function GET(
   return NextResponse.json(data, { status: response.status });
 }
 
-export async function PATCH(
+export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -27,8 +27,8 @@ export async function PATCH(
   const cookies = request.headers.get("cookie") || "";
   const csrfToken = request.headers.get("x-csrf-token") || "";
 
-  const response = await fetch(`${API_BASE}/managers/${id}/status`, {
-    method: "PATCH",
+  const response = await fetch(`${API_BASE}/managers/${id}`, {
+    method: "PUT",
     headers: {
       "Content-Type": "application/json",
       cookie: cookies,

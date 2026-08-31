@@ -37,6 +37,12 @@ export interface CreateManagerInput {
   password: string;
 }
 
+export interface UpdateManagerInput {
+  name?: string;
+  email?: string;
+  primaryContact?: string;
+}
+
 export interface ManagerQueryParams {
   page?: number;
   limit?: number;
