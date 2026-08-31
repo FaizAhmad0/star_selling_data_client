@@ -11,8 +11,12 @@ function getManagerName(manager: ManagerRef | string | undefined): string {
   return manager.name || "—";
 }
 
-function getEnrollment(user: User): string {
-  return user.enrollmentIdAmazon || user.enrollmentIdWebsite || user.enrollmentIdEtsy || "—";
+function getAllEnrollments(user: User): { platform: string; id: string }[] {
+  const enrollments: { platform: string; id: string }[] = [];
+  if (user.enrollmentIdAmazon) enrollments.push({ platform: "Amazon", id: user.enrollmentIdAmazon });
+  if (user.enrollmentIdWebsite) enrollments.push({ platform: "Website", id: user.enrollmentIdWebsite });
+  if (user.enrollmentIdEtsy) enrollments.push({ platform: "Etsy", id: user.enrollmentIdEtsy });
+  return enrollments;
 }
 
 function getBatch(user: User): string {
@@ -30,13 +34,9 @@ function getManager(user: User): string {
 function PlatformsCell({ platforms }: { platforms?: PlatformRef[] }) {
   if (!platforms || platforms.length === 0) return <span className="text-xs text-muted-foreground">—</span>;
 
-  const maxVisible = 2;
-  const visible = platforms.slice(0, maxVisible);
-  const remaining = platforms.length - maxVisible;
-
   return (
     <div className="flex flex-wrap gap-1">
-      {visible.map((p) => (
+      {platforms.map((p) => (
         <span
           key={p._id}
           className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary"
@@ -44,11 +44,6 @@ function PlatformsCell({ platforms }: { platforms?: PlatformRef[] }) {
           {p.name}
         </span>
       ))}
-      {remaining > 0 && (
-        <span className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">
-          +{remaining} more
-        </span>
-      )}
     </div>
   );
 }
@@ -87,8 +82,21 @@ export function UsersTable({ users, meta, isLoading, onPageChange, onView, onEdi
       key: "enrollment",
       responsive: ["sm"],
       render: (_, record) => {
-        const enrollment = getEnrollment(record);
-        return <span className="font-mono text-xs text-foreground">{enrollment !== "—" ? enrollment : "—"}</span>;
+        const enrollments = getAllEnrollments(record);
+        if (enrollments.length === 0) return <span className="text-xs text-muted-foreground">—</span>;
+        return (
+          <div className="flex flex-wrap gap-1">
+            {enrollments.map((e) => (
+              <span
+                key={e.platform}
+                className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary"
+              >
+                <span className="text-muted-foreground">{e.platform}:</span>
+                <span className="font-mono">{e.id}</span>
+              </span>
+            ))}
+          </div>
+        );
       },
     },
     {
