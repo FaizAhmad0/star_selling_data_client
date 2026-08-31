@@ -6,6 +6,7 @@ export interface Manager {
   primaryContact?: string;
   gst?: string;
   role: "manager";
+  platform?: { _id: string; name: string; status: string };
   createdAt: string;
   updatedAt: string;
 }
@@ -35,12 +36,14 @@ export interface CreateManagerInput {
   email: string;
   primaryContact: string;
   password: string;
+  platform?: string;
 }
 
 export interface UpdateManagerInput {
   name?: string;
   email?: string;
   primaryContact?: string;
+  platform?: string;
 }
 
 export interface ManagerQueryParams {

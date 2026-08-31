@@ -18,6 +18,7 @@ export const createManagerSchema = z.object({
     .string()
     .min(1, "Password is required")
     .min(6, "Password must be at least 6 characters"),
+  platform: z.string().optional(),
 });
 
 export type CreateManagerFormInput = z.infer<typeof createManagerSchema>;

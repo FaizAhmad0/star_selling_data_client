@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, UserPlus, Eye, EyeOff } from "lucide-react";
@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useCreateManager } from "@/features/managers/hooks/use-managers";
+import { usePlatforms } from "@/features/platforms/hooks/use-platforms";
 import {
   createManagerSchema,
   type CreateManagerFormInput,
@@ -23,6 +24,12 @@ export function AddManagerModal({ open, onClose }: AddManagerModalProps) {
   const [showPassword, setShowPassword] = useState(false);
   const createManager = useCreateManager();
 
+  const { data: platformsData } = usePlatforms({ limit: 100, status: "active" });
+  const platforms = useMemo(
+    () => platformsData?.data?.data ?? [],
+    [platformsData]
+  );
+
   const {
     register,
     handleSubmit,
@@ -35,6 +42,7 @@ export function AddManagerModal({ open, onClose }: AddManagerModalProps) {
       email: "",
       primaryContact: "",
       password: "",
+      platform: "",
     },
   });
 
@@ -55,7 +63,7 @@ export function AddManagerModal({ open, onClose }: AddManagerModalProps) {
   };
 
   return (
-    <Modal open={open} onClose={handleClose}>
+    <Modal open={open} onClose={handleClose} className="max-h-[90vh]">
       <ModalHeader
         title="Add New Manager"
         description="Create a new manager account with login credentials."
@@ -107,6 +115,28 @@ export function AddManagerModal({ open, onClose }: AddManagerModalProps) {
               {errors.primaryContact && (
                 <p className="text-xs text-destructive">
                   {errors.primaryContact.message}
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="platform">Platform</Label>
+              <select
+                id="platform"
+                disabled={createManager.isPending}
+                {...register("platform")}
+                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-xs shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <option value="">Select a platform</option>
+                {platforms.map((platform) => (
+                  <option key={platform._id} value={platform._id}>
+                    {platform.name}
+                  </option>
+                ))}
+              </select>
+              {errors.platform && (
+                <p className="text-xs text-destructive">
+                  {errors.platform.message}
                 </p>
               )}
             </div>

@@ -99,6 +99,16 @@ export function ManagersTable({
       ),
     },
     {
+      title: "Platform",
+      key: "platform",
+      responsive: ["lg"],
+      render: (_, record) => (
+        <span className="text-xs text-muted-foreground">
+          {record.platform?.name || "—"}
+        </span>
+      ),
+    },
+    {
       title: "Created",
       dataIndex: "createdAt",
       key: "createdAt",

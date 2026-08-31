@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, LogOut, Users, X } from "lucide-react";
+import { LayoutDashboard, LogOut, Users, Layers, X } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -118,6 +118,7 @@ export const adminNavItems: SidebarNavItem[] = [
   { label: "Users", href: "/admin/users", icon: Users },
   { label: "Managers", href: "/admin/managers", icon: Users },
   { label: "Supervisors", href: "/admin/supervisors", icon: Users },
+  { label: "Platforms", href: "/admin/platforms", icon: Layers },
 ];
 
 export const managerNavItems: SidebarNavItem[] = [
