@@ -55,10 +55,16 @@ interface UsersTableProps {
   onPageChange: (page: number) => void;
   onView: (user: User) => void;
   onEdit: (user: User) => void;
-  onDelete: (user: User) => void;
+  onDelete?: (user: User) => void;
+  maskPhone?: boolean;
 }
 
-export function UsersTable({ users, meta, isLoading, onPageChange, onView, onEdit, onDelete }: UsersTableProps) {
+function maskPhoneNumber(phone: string): string {
+  if (!phone || phone.length <= 4) return phone;
+  return "X".repeat(phone.length - 4) + phone.slice(-4);
+}
+
+export function UsersTable({ users, meta, isLoading, onPageChange, onView, onEdit, onDelete, maskPhone }: UsersTableProps) {
   const columns: TableProps<User>["columns"] = [
     {
       title: "User",
@@ -118,7 +124,10 @@ export function UsersTable({ users, meta, isLoading, onPageChange, onView, onEdi
       dataIndex: "primaryContact",
       key: "primaryContact",
       responsive: ["md"],
-      render: (val: string) => <span className="text-xs text-muted-foreground">{val || "—"}</span>,
+      render: (val: string) => {
+        const display = maskPhone && val ? maskPhoneNumber(val) : val;
+        return <span className="text-xs text-muted-foreground">{display || "—"}</span>;
+      },
     },
     {
       title: "Platforms",
@@ -160,10 +169,11 @@ export function UsersTable({ users, meta, isLoading, onPageChange, onView, onEdi
     //     );
     //   },
     // },
+    
     {
       title: "Actions",
       key: "actions",
-      width: 120,
+      width: onDelete ? 120 : 80,
       fixed: "right",
       render: (_, record) => (
         <Space size={4}>
@@ -173,11 +183,13 @@ export function UsersTable({ users, meta, isLoading, onPageChange, onView, onEdi
           <Tooltip title="Edit" placement="top">
             <Button type="text" size="small" icon={<EditOutlined />} onClick={() => onEdit(record)} className="text-muted-foreground hover:!text-foreground" />
           </Tooltip>
-          <Popconfirm title="Delete user" description="This action cannot be undone." onConfirm={() => onDelete(record)} okText="Delete" cancelText="Cancel" okButtonProps={{ danger: true }}>
-            <Tooltip title="Delete" placement="top">
-              <Button type="text" size="small" icon={<DeleteOutlined />} className="text-muted-foreground hover:!text-destructive" />
-            </Tooltip>
-          </Popconfirm>
+          {onDelete && (
+            <Popconfirm title="Delete user" description="This action cannot be undone." onConfirm={() => onDelete(record)} okText="Delete" cancelText="Cancel" okButtonProps={{ danger: true }}>
+              <Tooltip title="Delete" placement="top">
+                <Button type="text" size="small" icon={<DeleteOutlined />} className="text-muted-foreground hover:!text-destructive" />
+              </Tooltip>
+            </Popconfirm>
+          )}
         </Space>
       ),
     },
