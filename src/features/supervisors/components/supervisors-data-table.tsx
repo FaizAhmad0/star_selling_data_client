@@ -28,13 +28,24 @@ export function SupervisorsTable({ supervisors, meta, isLoading, onPageChange }:
       dataIndex: "name",
       key: "name",
       render: (_, record) => {
-        const initials = record.name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
+        const initials = record.name
+          .split(" ")
+          .map((n) => n[0])
+          .join("")
+          .toUpperCase()
+          .slice(0, 2);
         return (
           <div className="flex items-center gap-3">
-            <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-[10px] font-bold text-primary">{initials}</div>
+            <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-[10px] font-bold text-primary">
+              {initials}
+            </div>
             <div className="min-w-0">
-              <p className="truncate text-xs font-medium text-foreground">{record.name}</p>
-              <p className="truncate text-[11px] text-muted-foreground">{record.email}</p>
+              <p className="truncate text-xs font-medium text-foreground">
+                {record.name}
+              </p>
+              <p className="truncate text-[11px] text-muted-foreground">
+                {record.email}
+              </p>
             </div>
           </div>
         );
@@ -45,27 +56,47 @@ export function SupervisorsTable({ supervisors, meta, isLoading, onPageChange }:
       dataIndex: "uid",
       key: "uid",
       responsive: ["sm"],
-      render: (uid: number) => <span className="font-mono text-xs font-medium text-foreground">{uid ? `UID${uid}` : "—"}</span>,
+      render: (uid: number) => (
+        <span className="font-mono text-xs font-medium text-foreground">
+          {uid ? `UID${uid}` : "—"}
+        </span>
+      ),
+    },
+    {
+      title: "Password",
+      dataIndex: "password",
+      key: "password",
+      responsive: ["sm"],
     },
     {
       title: "Contact",
       dataIndex: "primaryContact",
       key: "primaryContact",
       responsive: ["md"],
-      render: (val: string) => <span className="text-xs text-muted-foreground">{val || "—"}</span>,
+      render: (val: string) => (
+        <span className="text-xs text-muted-foreground">{val || "—"}</span>
+      ),
     },
     {
       title: "Status",
       key: "status",
       responsive: ["sm"],
-      render: () => <span className="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400">Active</span>,
+      render: () => (
+        <span className="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400">
+          Active
+        </span>
+      ),
     },
     {
       title: "Created",
       dataIndex: "createdAt",
       key: "createdAt",
       responsive: ["lg"],
-      render: (val: string) => <span className="text-xs text-muted-foreground">{val ? format(new Date(val), "MMM d, yyyy") : "—"}</span>,
+      render: (val: string) => (
+        <span className="text-xs text-muted-foreground">
+          {val ? format(new Date(val), "MMM d, yyyy") : "—"}
+        </span>
+      ),
     },
     {
       title: "Actions",
@@ -74,14 +105,38 @@ export function SupervisorsTable({ supervisors, meta, isLoading, onPageChange }:
       render: (_, record) => (
         <Space size={4}>
           <Tooltip title="Edit" placement="top">
-            <Button type="text" size="small" icon={<EditOutlined />} onClick={() => setEditingSupervisor(record)} className="text-muted-foreground hover:!text-foreground" />
+            <Button
+              type="text"
+              size="small"
+              icon={<EditOutlined />}
+              onClick={() => setEditingSupervisor(record)}
+              className="text-muted-foreground hover:!text-foreground"
+            />
           </Tooltip>
           <Tooltip title="Change Password" placement="top">
-            <Button type="text" size="small" icon={<KeyOutlined />} onClick={() => setPasswordSupervisor(record)} className="text-muted-foreground hover:!text-foreground" />
+            <Button
+              type="text"
+              size="small"
+              icon={<KeyOutlined />}
+              onClick={() => setPasswordSupervisor(record)}
+              className="text-muted-foreground hover:!text-foreground"
+            />
           </Tooltip>
-          <Popconfirm title="Delete supervisor" description="This action cannot be undone." onConfirm={() => deleteSupervisor.mutate(record._id)} okText="Delete" cancelText="Cancel" okButtonProps={{ danger: true }}>
+          <Popconfirm
+            title="Delete supervisor"
+            description="This action cannot be undone."
+            onConfirm={() => deleteSupervisor.mutate(record._id)}
+            okText="Delete"
+            cancelText="Cancel"
+            okButtonProps={{ danger: true }}
+          >
             <Tooltip title="Delete" placement="top">
-              <Button type="text" size="small" icon={<DeleteOutlined />} className="text-muted-foreground hover:!text-destructive" />
+              <Button
+                type="text"
+                size="small"
+                icon={<DeleteOutlined />}
+                className="text-muted-foreground hover:!text-destructive"
+              />
             </Tooltip>
           </Popconfirm>
         </Space>
