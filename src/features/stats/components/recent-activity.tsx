@@ -9,6 +9,7 @@ import type { AdminStats } from "@/features/stats/types";
 
 interface RecentActivityProps {
   users: AdminStats["recentUsers"];
+  viewAllHref?: string;
 }
 
 function getPlatformInfo(user: AdminStats["recentUsers"][0]) {
@@ -38,7 +39,7 @@ function getAvatarColor(name: string) {
   return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
 }
 
-export function RecentActivity({ users }: RecentActivityProps) {
+export function RecentActivity({ users, viewAllHref = "/admin/users" }: RecentActivityProps) {
   const router = useRouter();
 
   return (
@@ -53,7 +54,7 @@ export function RecentActivity({ users }: RecentActivityProps) {
             variant="ghost"
             size="sm"
             className="gap-1 text-[10px] text-muted-foreground hover:text-foreground"
-            onClick={() => router.push("/admin/users")}
+            onClick={() => router.push(viewAllHref)}
           >
             View all <ArrowRight className="size-3" />
           </Button>

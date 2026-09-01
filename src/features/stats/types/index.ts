@@ -54,3 +54,32 @@ export interface PlatformStatsResponse {
   message: string;
   data: PlatformStats;
 }
+
+export interface ManagerStats {
+  totalUsers: number;
+  activeUsers: number;
+  inactiveUsers: number;
+  totalEnrollments: number;
+  usersByPlatform: {
+    amazon: number;
+    website: number;
+    etsy: number;
+  };
+  recentUsers: {
+    _id: string;
+    name: string;
+    email: string;
+    enrollmentIdAmazon?: string;
+    enrollmentIdWebsite?: string;
+    enrollmentIdEtsy?: string;
+    createdAt: string;
+  }[];
+  monthlyGrowth: { month: string; label: string; count: number }[];
+  enrollmentsByMonth: { month: string; label: string; amazon: number; website: number; etsy: number }[];
+}
+
+export interface ManagerStatsResponse {
+  success: boolean;
+  message: string;
+  data: ManagerStats;
+}
