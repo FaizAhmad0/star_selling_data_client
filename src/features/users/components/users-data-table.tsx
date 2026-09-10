@@ -13,9 +13,12 @@ function getManagerName(manager: ManagerRef | string | undefined): string {
 
 function getAllEnrollments(user: User): { platform: string; id: string }[] {
   const enrollments: { platform: string; id: string }[] = [];
-  if (user.enrollmentIdAmazon) enrollments.push({ platform: "Amazon", id: user.enrollmentIdAmazon });
-  if (user.enrollmentIdWebsite) enrollments.push({ platform: "Website", id: user.enrollmentIdWebsite });
-  if (user.enrollmentIdEtsy) enrollments.push({ platform: "Etsy", id: user.enrollmentIdEtsy });
+  if (user.enrollmentIdAmazon)
+    enrollments.push({ platform: "Amazon", id: user.enrollmentIdAmazon });
+  if (user.enrollmentIdWebsite)
+    enrollments.push({ platform: "Website", id: user.enrollmentIdWebsite });
+  if (user.enrollmentIdEtsy)
+    enrollments.push({ platform: "Etsy", id: user.enrollmentIdEtsy });
   return enrollments;
 }
 
@@ -23,16 +26,33 @@ function getBatch(user: User): string {
   return user.batchAmazon || user.batchWebsite || user.batchEtsy || "—";
 }
 
-function getJoiningDate(user: User): string {
-  return user.dateAmazon || user.dateWebsite || user.dateEtsy || "—";
-}
+function getAllManagers(user: User): { platform: string; name: string }[] {
+  const managers: { platform: string; name: string }[] = [];
 
-function getManager(user: User): string {
-  return getManagerName(user.amazonManager || user.websiteManager || user.etsyManager);
+  if (user.amazonManager)
+    managers.push({
+      platform: "Amazon",
+      name: getManagerName(user.amazonManager),
+    });
+
+  if (user.websiteManager)
+    managers.push({
+      platform: "Website",
+      name: getManagerName(user.websiteManager),
+    });
+
+  if (user.etsyManager)
+    managers.push({
+      platform: "Etsy",
+      name: getManagerName(user.etsyManager),
+    });
+
+  return managers;
 }
 
 function PlatformsCell({ platforms }: { platforms?: PlatformRef[] }) {
-  if (!platforms || platforms.length === 0) return <span className="text-xs text-muted-foreground">—</span>;
+  if (!platforms || platforms.length === 0)
+    return <span className="text-xs text-muted-foreground">—</span>;
 
   return (
     <div className="flex flex-wrap gap-1">
@@ -64,20 +84,40 @@ function maskPhoneNumber(phone: string): string {
   return "X".repeat(phone.length - 4) + phone.slice(-4);
 }
 
-export function UsersTable({ users, meta, isLoading, onPageChange, onView, onEdit, onDelete, maskPhone }: UsersTableProps) {
+export function UsersTable({
+  users,
+  meta,
+  isLoading,
+  onPageChange,
+  onView,
+  onEdit,
+  onDelete,
+  maskPhone,
+}: UsersTableProps) {
   const columns: TableProps<User>["columns"] = [
     {
       title: "User",
       dataIndex: "name",
       key: "name",
       render: (_, record) => {
-        const initials = record.name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
+        const initials = record.name
+          .split(" ")
+          .map((n) => n[0])
+          .join("")
+          .toUpperCase()
+          .slice(0, 2);
         return (
           <div className="flex items-center gap-3">
-            <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-[10px] font-bold text-primary">{initials}</div>
+            <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-[10px] font-bold text-primary">
+              {initials}
+            </div>
             <div className="min-w-0">
-              <p className="truncate text-xs font-medium text-foreground">{record.name}</p>
-              <p className="truncate text-[11px] text-muted-foreground">{record.email}</p>
+              <p className="truncate text-xs font-medium text-foreground">
+                {record.name}
+              </p>
+              <p className="truncate text-[11px] text-muted-foreground">
+                {record.email}
+              </p>
             </div>
           </div>
         );
@@ -88,14 +128,20 @@ export function UsersTable({ users, meta, isLoading, onPageChange, onView, onEdi
       dataIndex: "uid",
       key: "uid",
       responsive: ["sm"],
-      render: (val: number) => <span className="font-mono text-xs text-foreground">{val ? `UID${val}`: "—"}</span>,
+      render: (val: number) => (
+        <span className="font-mono text-xs text-foreground">
+          {val ? `UID${val}` : "—"}
+        </span>
+      ),
     },
     {
       title: "Password",
       dataIndex: "password",
       key: "password",
       responsive: ["sm"],
-      render: (val: string) => <span className="font-mono text-xs text-foreground">{val || "—"}</span>,
+      render: (val: string) => (
+        <span className="font-mono text-xs text-foreground">{val || "—"}</span>
+      ),
     },
     {
       title: "Enrollment",
@@ -103,7 +149,8 @@ export function UsersTable({ users, meta, isLoading, onPageChange, onView, onEdi
       responsive: ["sm"],
       render: (_, record) => {
         const enrollments = getAllEnrollments(record);
-        if (enrollments.length === 0) return <span className="text-xs text-muted-foreground">—</span>;
+        if (enrollments.length === 0)
+          return <span className="text-xs text-muted-foreground">—</span>;
         return (
           <div className="flex flex-wrap gap-1">
             {enrollments.map((e) => (
@@ -126,7 +173,11 @@ export function UsersTable({ users, meta, isLoading, onPageChange, onView, onEdi
       responsive: ["md"],
       render: (val: string) => {
         const display = maskPhone && val ? maskPhoneNumber(val) : val;
-        return <span className="text-xs text-muted-foreground">{display || "—"}</span>;
+        return (
+          <span className="text-xs text-muted-foreground">
+            {display || "—"}
+          </span>
+        );
       },
     },
     {
@@ -138,14 +189,39 @@ export function UsersTable({ users, meta, isLoading, onPageChange, onView, onEdi
     {
       title: "Manager",
       key: "manager",
-      responsive: ["lg"],
-      render: (_, record) => <span className="text-xs text-muted-foreground">{getManager(record)}</span>,
+      responsive: ["sm"],
+      render: (_, record) => {
+        const managers = getAllManagers(record);
+
+        if (managers.length === 0)
+          return <span className="text-xs text-muted-foreground">—</span>;
+
+        return (
+          <div className="flex flex-wrap gap-1">
+            {managers.map((manager) => (
+              <span
+                key={manager.platform}
+                className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary"
+              >
+                <span className="text-muted-foreground">
+                  {manager.platform}:
+                </span>
+                <span>{manager.name}</span>
+              </span>
+            ))}
+          </div>
+        );
+      },
     },
     {
       title: "Batch",
       key: "batch",
       responsive: ["lg"],
-      render: (_, record) => <span className="text-xs text-muted-foreground">{getBatch(record)}</span>,
+      render: (_, record) => (
+        <span className="text-xs text-muted-foreground">
+          {getBatch(record)}
+        </span>
+      ),
     },
     // {
     //   title: "Joining Date",
@@ -169,7 +245,7 @@ export function UsersTable({ users, meta, isLoading, onPageChange, onView, onEdi
     //     );
     //   },
     // },
-    
+
     {
       title: "Actions",
       key: "actions",
@@ -178,15 +254,39 @@ export function UsersTable({ users, meta, isLoading, onPageChange, onView, onEdi
       render: (_, record) => (
         <Space size={4}>
           <Tooltip title="View" placement="top">
-            <Button type="text" size="small" icon={<EyeOutlined />} onClick={() => onView(record)} className="text-muted-foreground hover:!text-foreground" />
+            <Button
+              type="text"
+              size="small"
+              icon={<EyeOutlined />}
+              onClick={() => onView(record)}
+              className="text-muted-foreground hover:!text-foreground"
+            />
           </Tooltip>
           <Tooltip title="Edit" placement="top">
-            <Button type="text" size="small" icon={<EditOutlined />} onClick={() => onEdit(record)} className="text-muted-foreground hover:!text-foreground" />
+            <Button
+              type="text"
+              size="small"
+              icon={<EditOutlined />}
+              onClick={() => onEdit(record)}
+              className="text-muted-foreground hover:!text-foreground"
+            />
           </Tooltip>
           {onDelete && (
-            <Popconfirm title="Delete user" description="This action cannot be undone." onConfirm={() => onDelete(record)} okText="Delete" cancelText="Cancel" okButtonProps={{ danger: true }}>
+            <Popconfirm
+              title="Delete user"
+              description="This action cannot be undone."
+              onConfirm={() => onDelete(record)}
+              okText="Delete"
+              cancelText="Cancel"
+              okButtonProps={{ danger: true }}
+            >
               <Tooltip title="Delete" placement="top">
-                <Button type="text" size="small" icon={<DeleteOutlined />} className="text-muted-foreground hover:!text-destructive" />
+                <Button
+                  type="text"
+                  size="small"
+                  icon={<DeleteOutlined />}
+                  className="text-muted-foreground hover:!text-destructive"
+                />
               </Tooltip>
             </Popconfirm>
           )}
@@ -208,7 +308,8 @@ export function UsersTable({ users, meta, isLoading, onPageChange, onView, onEdi
           pageSize: meta.limit,
           total: meta.total,
           showSizeChanger: false,
-          showTotal: (total, range) => `Showing ${range[0]}\u2013${range[1]} of ${total} users`,
+          showTotal: (total, range) =>
+            `Showing ${range[0]}\u2013${range[1]} of ${total} users`,
           onChange: (page) => onPageChange(page),
         }}
         scroll={{ x: 1000 }}
