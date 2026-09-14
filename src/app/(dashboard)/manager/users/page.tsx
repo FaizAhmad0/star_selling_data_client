@@ -17,9 +17,9 @@ export default function ManagerUsersPage() {
 
   const page = Number(searchParams.get("page")) || 1;
   const search = searchParams.get("search") || "";
-  const status = searchParams.get("status") || "";
   const batch = searchParams.get("batch") || "";
   const joiningDate = searchParams.get("joiningDate") || "";
+  const platform = searchParams.get("platform") || "";
 
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout>>(null);
@@ -72,16 +72,16 @@ export default function ManagerUsersPage() {
   );
 
   const handleClearFilters = useCallback(() => {
-    updateParams({ status: "", batch: "", joiningDate: "", page: "1" });
+    updateParams({ batch: "", joiningDate: "", platform: "", page: "1" });
   }, [updateParams]);
 
   const { data, isLoading, isError, refetch } = useUsers({
     page,
     limit,
     search: search || undefined,
-    status: (status as "active" | "inactive") || undefined,
     batch: batch || undefined,
     joiningDate: joiningDate || undefined,
+    platform: (platform as "amazon" | "website" | "etsy") || undefined,
   });
 
   const users = data?.data?.data ?? [];
@@ -89,11 +89,13 @@ export default function ManagerUsersPage() {
 
   const filterGroups = [
     {
-      label: "Status",
-      key: "status",
+      label: "Platform",
+      key: "platform",
+      type: "select" as const,
       options: [
-        { label: "Active", value: "active" },
-        { label: "Inactive", value: "inactive" },
+        { label: "Amazon", value: "amazon" },
+        { label: "Website", value: "website" },
+        { label: "Etsy", value: "etsy" },
       ],
     },
     { label: "Batch", key: "batch", type: "text" as const },
@@ -101,7 +103,7 @@ export default function ManagerUsersPage() {
   ];
 
   const activeFilters: Record<string, string> = {};
-  if (status) activeFilters.status = status;
+  if (platform) activeFilters.platform = platform;
   if (batch) activeFilters.batch = batch;
   if (joiningDate) activeFilters.joiningDate = joiningDate;
 
@@ -171,6 +173,7 @@ export default function ManagerUsersPage() {
           filters={filterGroups}
           activeFilters={activeFilters}
           onFilterChange={handleFilterChange}
+          onApplyFilters={() => {}}
           onClearFilters={handleClearFilters}
         />
       </div>

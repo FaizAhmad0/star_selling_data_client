@@ -20,10 +20,10 @@ export default function AdminUsersPage() {
 
   const page = Number(searchParams.get("page")) || 1;
   const search = searchParams.get("search") || "";
-  const status = searchParams.get("status") || "";
   const manager = searchParams.get("manager") || "";
   const batch = searchParams.get("batch") || "";
   const joiningDate = searchParams.get("joiningDate") || "";
+  const platform = searchParams.get("platform") || "";
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isBulkUploadOpen, setIsBulkUploadOpen] = useState(false);
@@ -79,7 +79,7 @@ export default function AdminUsersPage() {
   );
 
   const handleClearFilters = useCallback(() => {
-    updateParams({ status: "", manager: "", batch: "", joiningDate: "", page: "1" });
+    updateParams({ manager: "", batch: "", joiningDate: "", platform: "", page: "1" });
   }, [updateParams]);
 
   const handleDownloadSample = useCallback(() => {
@@ -98,10 +98,10 @@ export default function AdminUsersPage() {
     page,
     limit,
     search: search || undefined,
-    status: (status as "active" | "inactive") || undefined,
     manager: manager || undefined,
     batch: batch || undefined,
     joiningDate: joiningDate || undefined,
+    platform: (platform as "amazon" | "website" | "etsy") || undefined,
   });
 
   const users = data?.data?.data ?? [];
@@ -109,11 +109,13 @@ export default function AdminUsersPage() {
 
   const filterGroups = [
     {
-      label: "Status",
-      key: "status",
+      label: "Platform",
+      key: "platform",
+      type: "select" as const,
       options: [
-        { label: "Active", value: "active" },
-        { label: "Inactive", value: "inactive" },
+        { label: "Amazon", value: "amazon" },
+        { label: "Website", value: "website" },
+        { label: "Etsy", value: "etsy" },
       ],
     },
     { label: "Manager", key: "manager", type: "manager-select" as const },
@@ -122,7 +124,7 @@ export default function AdminUsersPage() {
   ];
 
   const activeFilters: Record<string, string> = {};
-  if (status) activeFilters.status = status;
+  if (platform) activeFilters.platform = platform;
   if (manager) activeFilters.manager = manager;
   if (batch) activeFilters.batch = batch;
   if (joiningDate) activeFilters.joiningDate = joiningDate;
@@ -207,6 +209,7 @@ export default function AdminUsersPage() {
           filters={filterGroups}
           activeFilters={activeFilters}
           onFilterChange={handleFilterChange}
+          onApplyFilters={() => {}}
           onClearFilters={handleClearFilters}
           managerOptions={managerOptions}
           managerLoading={managersLoading}
