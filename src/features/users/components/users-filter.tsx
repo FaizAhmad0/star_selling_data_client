@@ -16,6 +16,7 @@ interface FilterGroup {
   options?: FilterOption[];
   type?: "select" | "date" | "text" | "manager-select" | "platform-select";
   loading?: boolean;
+  error?: string;
 }
 
 interface UsersFilterProps {
@@ -123,10 +124,10 @@ export function UsersFilter({
                       <select
                         value={activeFilters[group.key] || ""}
                         onChange={(e) => onFilterChange(group.key, e.target.value)}
-                        disabled={group.loading}
+                        disabled={group.loading || Boolean(group.error)}
                         className="flex h-8 w-full rounded-md border border-input bg-transparent px-2 py-1 text-xs shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 appearance-none pr-7"
                       >
-                        <option value="">{group.loading ? "Loading..." : "All platforms"}</option>
+                        <option value="">{group.error || (group.loading ? "Loading..." : "All platforms")}</option>
                         {group.options?.map((opt) => (
                           <option key={opt.value} value={opt.value}>{opt.label}</option>
                         ))}

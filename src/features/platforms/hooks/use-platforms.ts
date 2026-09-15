@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
   getPlatforms,
+  getAllPlatforms,
   createPlatform,
   updatePlatform,
   deletePlatform,
@@ -16,6 +17,18 @@ export function usePlatforms(params: PlatformQueryParams = {}) {
   return useQuery({
     queryKey: ["platforms", params],
     queryFn: () => getPlatforms(params),
+    staleTime: 30_000,
+  });
+}
+
+export function usePlatformOptions() {
+  return useQuery({
+    queryKey: ["platforms", "options"],
+    queryFn: getAllPlatforms,
+    select: (platforms) => platforms.map((platform) => ({
+      label: platform.name,
+      value: platform._id,
+    })),
     staleTime: 30_000,
   });
 }

@@ -1,5 +1,6 @@
 import { apiGet, apiPost, apiPut, apiDelete } from "@/lib/axios";
 import type {
+  Platform,
   PlatformListResponse,
   PlatformSingleResponse,
   CreatePlatformInput,
@@ -22,6 +23,21 @@ export async function getPlatforms(
 ): Promise<PlatformListResponse> {
   const queryString = buildQueryString(params);
   return apiGet<PlatformListResponse>(`/platforms${queryString}`);
+}
+
+export async function getAllPlatforms(): Promise<Platform[]> {
+  const platforms: Platform[] = [];
+  let page = 1;
+  let totalPages = 1;
+
+  do {
+    const response = await getPlatforms({ page, limit: 100 });
+    platforms.push(...response.data.data);
+    totalPages = response.data.meta.totalPages;
+    page += 1;
+  } while (page <= totalPages);
+
+  return platforms.sort((a, b) => a.name.localeCompare(b.name));
 }
 
 export async function getPlatformById(

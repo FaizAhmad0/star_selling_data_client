@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useUsers, useDeleteUser } from "@/features/users/hooks/use-users";
 import { useManagers } from "@/features/managers/hooks/use-managers";
+import { usePlatformOptions } from "@/features/platforms/hooks/use-platforms";
 import { AddUserModal } from "@/features/users/components/add-user-modal";
 import { EditUserModal } from "@/features/users/components/edit-user-modal";
 import { BulkUploadModal } from "@/features/users/components/bulk-upload-modal";
@@ -53,7 +54,7 @@ export default function AdminUsersPage() {
       if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
       debounceTimerRef.current = setTimeout(() => {
         updateParams({ search: value, page: "1" });
-      }, 400);
+      }, 700);
     },
     [updateParams]
   );
@@ -93,6 +94,12 @@ export default function AdminUsersPage() {
 
   const { data: managersData, isLoading: managersLoading } = useManagers({ limit: 1000 });
   const managerOptions = (managersData?.data?.data ?? []).map((m) => ({ label: m.name, value: m.name }));
+  const {
+    data: platformOptions = [],
+    isLoading: platformsLoading,
+    isError: platformsError,
+    refetch: refetchPlatforms,
+  } = usePlatformOptions();
 
   const { data, isLoading, isError, refetch } = useUsers({
     page,
@@ -101,7 +108,7 @@ export default function AdminUsersPage() {
     manager: manager || undefined,
     batch: batch || undefined,
     joiningDate: joiningDate || undefined,
-    platform: (platform as "amazon" | "website" | "etsy") || undefined,
+    platform: platform || undefined,
   });
 
   const users = data?.data?.data ?? [];
@@ -111,12 +118,10 @@ export default function AdminUsersPage() {
     {
       label: "Platform",
       key: "platform",
-      type: "select" as const,
-      options: [
-        { label: "Amazon", value: "amazon" },
-        { label: "Website", value: "website" },
-        { label: "Etsy", value: "etsy" },
-      ],
+      type: "platform-select" as const,
+      options: platformOptions,
+      loading: platformsLoading,
+      error: platformsError ? "Failed to load platforms" : undefined,
     },
     { label: "Manager", key: "manager", type: "manager-select" as const },
     { label: "Batch", key: "batch", type: "text" as const },
@@ -124,7 +129,11 @@ export default function AdminUsersPage() {
   ];
 
   const activeFilters: Record<string, string> = {};
-  if (platform) activeFilters.platform = platform;
+  if (platform) {
+    activeFilters.platform = platformOptions.find((option) =>
+      option.value === platform || option.label.toLowerCase() === platform.toLowerCase()
+    )?.value ?? platform;
+  }
   if (manager) activeFilters.manager = manager;
   if (batch) activeFilters.batch = batch;
   if (joiningDate) activeFilters.joiningDate = joiningDate;
@@ -205,15 +214,22 @@ export default function AdminUsersPage() {
             className="h-8 pl-8 text-xs"
           />
         </div>
-        <UsersFilter
-          filters={filterGroups}
-          activeFilters={activeFilters}
-          onFilterChange={handleFilterChange}
-          onApplyFilters={() => {}}
-          onClearFilters={handleClearFilters}
-          managerOptions={managerOptions}
-          managerLoading={managersLoading}
-        />
+        <div className="flex items-center gap-2">
+          {platformsError && (
+            <Button variant="outline" size="sm" onClick={() => refetchPlatforms()}>
+              Retry loading platforms
+            </Button>
+          )}
+          <UsersFilter
+            filters={filterGroups}
+            activeFilters={activeFilters}
+            onFilterChange={handleFilterChange}
+            onApplyFilters={() => {}}
+            onClearFilters={handleClearFilters}
+            managerOptions={managerOptions}
+            managerLoading={managersLoading}
+          />
+        </div>
       </div>
 
       <UsersTable

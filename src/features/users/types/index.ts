@@ -84,7 +84,7 @@ export interface UserQueryParams {
   batch?: string;
   status?: "active" | "inactive";
   joiningDate?: string;
-  platform?: "amazon" | "website" | "etsy";
+  platform?: string;
 }
 
 export interface BulkUploadResult {
