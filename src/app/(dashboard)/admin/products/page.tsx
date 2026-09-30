@@ -8,15 +8,17 @@ import { Input } from "@/components/ui/input";
 import { UsersFilter } from "@/features/users/components/users-filter";
 import { ProductsTable } from "@/features/products/components/products-data-table";
 import { ProductModal } from "@/features/products/components/product-modal";
+import { BulkImportProductsModal } from "@/features/products/components/bulk-import-products-modal";
 import type { Product, ProductInput } from "@/features/products/types";
 
 export default function AdminProductsPage() {
-  // Client-only records entered by the user; no sample data or API calls.
+  // Manual entries remain client-only; the bulk import modal saves to the server.
   const [products, setProducts] = useState<Product[]>([]);
   const [search, setSearch] = useState("");
   const [filters, setFilters] = useState<Record<string, string>>({});
   const [page, setPage] = useState(1);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isBulkImportOpen, setIsBulkImportOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isViewing, setIsViewing] = useState(false);
   const limit = 10;
@@ -80,12 +82,10 @@ export default function AdminProductsPage() {
             <Download className="size-3.5" />
             Download Sample
           </Button>
-          <span title="Bulk product upload will be added in the next step.">
-            <Button variant="outline" size="sm" disabled className="gap-1.5">
-              <Upload className="size-3.5" />
-              Bulk Upload
-            </Button>
-          </span>
+          <Button variant="outline" size="sm" onClick={() => setIsBulkImportOpen(true)} className="gap-1.5">
+            <Upload className="size-3.5" />
+            Bulk Upload
+          </Button>
           <Button size="sm" onClick={() => setIsAddModalOpen(true)} className="gap-1.5">
             <Plus className="size-3.5" />
             Add New Product
@@ -134,6 +134,9 @@ export default function AdminProductsPage() {
 
       {(isAddModalOpen || selectedProduct) && (
         <ProductModal product={selectedProduct} readOnly={isViewing} onClose={closeProductModal} onSave={saveProduct} />
+      )}
+      {isBulkImportOpen && (
+        <BulkImportProductsModal onClose={() => setIsBulkImportOpen(false)} onDownloadSample={handleDownloadSample} />
       )}
     </div>
   );
