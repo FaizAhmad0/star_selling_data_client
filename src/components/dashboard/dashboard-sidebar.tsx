@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, LogOut, Users, Layers, X } from "lucide-react";
+import { LayoutDashboard, LogOut, Users, Layers, X, ShoppingBag } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -119,6 +119,7 @@ export const adminNavItems: SidebarNavItem[] = [
   { label: "Managers", href: "/admin/managers", icon: Users },
   { label: "Supervisors", href: "/admin/supervisors", icon: Users },
   { label: "Platforms", href: "/admin/platforms", icon: Layers },
+  { label: "Products", href: "/admin/products", icon: ShoppingBag },
 ];
 
 export const managerNavItems: SidebarNavItem[] = [
