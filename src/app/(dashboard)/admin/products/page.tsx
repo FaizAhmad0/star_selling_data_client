@@ -54,6 +54,15 @@ export default function AdminProductsPage() {
     closeProductModal();
   };
 
+  const handleDownloadSample = () => {
+    const link = document.createElement("a");
+    link.href = "/sample.xlsx";
+    link.download = "sample.xlsx";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -67,12 +76,10 @@ export default function AdminProductsPage() {
           <p className="text-xs text-muted-foreground">Manage products, categories, and product details.</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <span title="Sample download will be available when bulk product upload is added.">
-            <Button variant="outline" size="sm" disabled className="gap-1.5">
-              <Download className="size-3.5" />
-              Download Sample
-            </Button>
-          </span>
+          <Button variant="outline" size="sm" onClick={handleDownloadSample} className="gap-1.5">
+            <Download className="size-3.5" />
+            Download Sample
+          </Button>
           <span title="Bulk product upload will be added in the next step.">
             <Button variant="outline" size="sm" disabled className="gap-1.5">
               <Upload className="size-3.5" />
