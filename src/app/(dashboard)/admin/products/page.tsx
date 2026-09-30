@@ -1,59 +1,49 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Download, Plus, Search, ShoppingBag, Upload } from "lucide-react";
-import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ErrorState } from "@/components/shared/error-state";
 import { UsersFilter } from "@/features/users/components/users-filter";
 import { ProductsTable } from "@/features/products/components/products-data-table";
 import { ProductModal } from "@/features/products/components/product-modal";
 import { BulkImportProductsModal } from "@/features/products/components/bulk-import-products-modal";
-import type { Product, ProductInput } from "@/features/products/types";
+import { useProducts } from "@/features/products/hooks/use-products";
+import type { Product } from "@/features/products/types";
 
 export default function AdminProductsPage() {
-  // Manual entries remain client-only; the bulk import modal saves to the server.
-  const [products, setProducts] = useState<Product[]>([]);
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [filters, setFilters] = useState<Record<string, string>>({});
+  const [draftFilters, setDraftFilters] = useState<Record<string, string>>({});
+  const [filterError, setFilterError] = useState("");
   const [page, setPage] = useState(1);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isBulkImportOpen, setIsBulkImportOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [isViewing, setIsViewing] = useState(false);
   const limit = 10;
 
-  const query = search.trim().toLowerCase();
-  const filteredProducts = products.filter((product) => {
-    const matchesSearch = [product.title, product.category, product.shortDescription, ...product.materials]
-      .some((value) => value.toLowerCase().includes(query));
-    const createdDate = product.createdAt.slice(0, 10);
-    return matchesSearch
-      && (!filters.category || product.category.toLowerCase().includes(filters.category.trim().toLowerCase()))
-      && (!filters.material || product.materials.some((material) => material.toLowerCase().includes(filters.material.trim().toLowerCase())))
-      && (!filters.createdAtFrom || createdDate >= filters.createdAtFrom)
-      && (!filters.createdAtTo || createdDate <= filters.createdAtTo);
+  useEffect(() => {
+    const timer = setTimeout(() => { setDebouncedSearch(search.trim()); setPage(1); }, 400);
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  const { data, isLoading, isFetching, isError, error, refetch } = useProducts({
+    page, limit, search: debouncedSearch,
+    category: filters.category, material: filters.material,
+    createdAtFrom: filters.createdAtFrom, createdAtTo: filters.createdAtTo,
   });
-  const currentPage = Math.min(page, Math.max(1, Math.ceil(filteredProducts.length / limit)));
+  const products = data?.data.data ?? [];
+  const meta = data?.data.meta ?? { page, limit, total: 0, totalPages: 0 };
 
-  const closeProductModal = () => {
-    setIsAddModalOpen(false);
-    setSelectedProduct(null);
-    setIsViewing(false);
-  };
-
-  const saveProduct = (input: ProductInput) => {
-    if (selectedProduct) {
-      setProducts((current) => current.map((product) => product._id === selectedProduct._id ? { ...product, ...input } : product));
-    } else {
-      const product = { ...input, _id: crypto.randomUUID(), createdAt: new Date().toISOString() };
-      setProducts((current) => [product, ...current]);
-      setSearch("");
-      setFilters({});
-      setPage(1);
+  const applyFilters = () => {
+    if (draftFilters.createdAtFrom && draftFilters.createdAtTo && draftFilters.createdAtFrom > draftFilters.createdAtTo) {
+      setFilterError("The start date must be on or before the end date.");
+      return;
     }
-    toast.success(selectedProduct ? "Product updated for this session" : "Product added for this session");
-    closeProductModal();
+    setFilterError("");
+    setFilters({ ...draftFilters });
+    setPage(1);
   };
 
   const handleDownloadSample = () => {
@@ -86,10 +76,12 @@ export default function AdminProductsPage() {
             <Upload className="size-3.5" />
             Bulk Upload
           </Button>
-          <Button size="sm" onClick={() => setIsAddModalOpen(true)} className="gap-1.5">
-            <Plus className="size-3.5" />
-            Add New Product
-          </Button>
+          <span title="Use Bulk Upload to add products. Individual product creation is not available yet.">
+            <Button size="sm" disabled className="gap-1.5">
+              <Plus className="size-3.5" />
+              Add New Product
+            </Button>
+          </span>
         </div>
       </div>
 
@@ -98,9 +90,10 @@ export default function AdminProductsPage() {
           <Search className="absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
           <Input
             aria-label="Search products"
-            placeholder="Search by title, category, or material..."
+            maxLength={200}
+            placeholder="Search by title, SKU, category, or material..."
             value={search}
-            onChange={(event) => { setSearch(event.target.value); setPage(1); }}
+            onChange={(event) => setSearch(event.target.value)}
             className="h-8 pl-8 text-xs"
           />
         </div>
@@ -111,29 +104,29 @@ export default function AdminProductsPage() {
               { label: "Material", key: "material", type: "text" },
               { label: "Created Date", key: "createdAt", type: "date" },
             ]}
-            activeFilters={filters}
-            onFilterChange={(key, value) => { setFilters((current) => ({ ...current, [key]: value })); setPage(1); }}
-            onApplyFilters={() => setPage(1)}
-            onClearFilters={() => { setFilters({}); setPage(1); }}
+            activeFilters={draftFilters}
+            onFilterChange={(key, value) => setDraftFilters((current) => ({ ...current, [key]: value }))}
+            onApplyFilters={applyFilters}
+            onClearFilters={() => { setDraftFilters({}); setFilters({}); setFilterError(""); setPage(1); }}
           />
         </div>
       </div>
 
-      <ProductsTable
-        products={filteredProducts.slice((currentPage - 1) * limit, currentPage * limit)}
-        meta={{ page: currentPage, limit, total: filteredProducts.length }}
-        onPageChange={setPage}
-        onView={(product) => { setSelectedProduct(product); setIsViewing(true); }}
-        onEdit={(product) => { setSelectedProduct(product); setIsViewing(false); }}
-        onDelete={(product) => {
-          setProducts((current) => current.filter((item) => item._id !== product._id));
-          setPage(currentPage);
-          toast.success("Product removed from this session");
-        }}
-      />
+      {filterError && <p role="alert" className="text-xs text-destructive">{filterError}</p>}
+      {isError ? (
+        <ErrorState title="Failed to load products" message={error?.message || "Please try again."} onRetry={() => { void refetch(); }} />
+      ) : (
+        <ProductsTable
+          products={products}
+          meta={meta}
+          isLoading={isLoading || isFetching}
+          onPageChange={setPage}
+          onView={setSelectedProduct}
+        />
+      )}
 
-      {(isAddModalOpen || selectedProduct) && (
-        <ProductModal product={selectedProduct} readOnly={isViewing} onClose={closeProductModal} onSave={saveProduct} />
+      {selectedProduct && (
+        <ProductModal product={selectedProduct} readOnly onClose={() => setSelectedProduct(null)} />
       )}
       {isBulkImportOpen && (
         <BulkImportProductsModal onClose={() => setIsBulkImportOpen(false)} onDownloadSample={handleDownloadSample} />

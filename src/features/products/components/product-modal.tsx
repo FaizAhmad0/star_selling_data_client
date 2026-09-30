@@ -12,7 +12,7 @@ interface ProductModalProps {
   product: Product | null;
   readOnly: boolean;
   onClose: () => void;
-  onSave: (input: ProductInput) => void;
+  onSave?: (input: ProductInput) => void;
 }
 
 const fields = [
@@ -30,7 +30,7 @@ export function ProductModal({ product, readOnly, onClose, onSave }: ProductModa
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (readOnly) return;
+    if (readOnly || !onSave) return;
     const data = new FormData(event.currentTarget);
     const value = (key: string) => String(data.get(key) || "").trim();
     const list = (key: string) => value(key).split(";").map((item) => item.trim()).filter(Boolean);
@@ -85,7 +85,7 @@ export function ProductModal({ product, readOnly, onClose, onSave }: ProductModa
         <ModalFooter>
           <Button type="button" variant="outline" onClick={onClose}>{readOnly ? "Close" : "Cancel"}</Button>
           {!readOnly && (
-            <Button type="submit" className="gap-1.5">
+            <Button type="submit" disabled={!onSave} className="gap-1.5">
               {product ? <Save className="size-3.5" /> : <Plus className="size-3.5" />}
               {product ? "Save Changes" : "Create Product"}
             </Button>

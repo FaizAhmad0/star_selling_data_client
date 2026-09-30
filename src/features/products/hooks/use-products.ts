@@ -1,8 +1,16 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { ApiError, ApiResponse } from "@/types/api";
-import { bulkImportProducts } from "../api/products.api";
-import type { ProductImportResult, ProductImportRow } from "../types";
+import { bulkImportProducts, getProducts } from "../api/products.api";
+import type { ProductImportResult, ProductImportRow, ProductListResponse, ProductQueryParams } from "../types";
+
+export function useProducts(params: ProductQueryParams = {}) {
+  return useQuery<ProductListResponse, ApiError>({
+    queryKey: ["products", params],
+    queryFn: ({ signal }) => getProducts(params, signal),
+    staleTime: 30_000,
+  });
+}
 
 export function useBulkImportProducts() {
   const queryClient = useQueryClient();

@@ -1,3 +1,5 @@
+import type { ApiResponse, PaginatedResponse } from "@/types/api";
+
 export interface ProductInput {
   title: string;
   category: string;
@@ -11,7 +13,42 @@ export interface ProductInput {
 export interface Product extends ProductInput {
   _id: string;
   createdAt: string;
+  categoryId: string | null;
+  colors: ProductColor[];
+  variantCount: number;
+  totalStock: number;
 }
+
+export interface ProductVariant {
+  _id: string;
+  sku: string;
+  size: string;
+  stock: number;
+  dimensions?: { length: number | null; width: number | null; height: number | null };
+  estimatedCostPrice: number | null;
+  estimatedSellingPrice: number | null;
+  estimatedCostPriceOOI: number | null;
+  estimatedSalePriceOOI: number | null;
+}
+
+export interface ProductColor {
+  _id: string;
+  color: string;
+  images: string[];
+  variants: ProductVariant[];
+}
+
+export interface ProductQueryParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  category?: string;
+  material?: string;
+  createdAtFrom?: string;
+  createdAtTo?: string;
+}
+
+export type ProductListResponse = ApiResponse<PaginatedResponse<Product>>;
 
 export type ProductImportCell = string | number | boolean | null;
 
