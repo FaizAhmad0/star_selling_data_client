@@ -6,6 +6,7 @@ import { DeleteOutlined, EditOutlined, EyeOutlined } from "@ant-design/icons";
 import { ShoppingBag } from "lucide-react";
 import type { Product } from "../types";
 import { ProductVariantsTable } from "./product-variants-table";
+import { ProductStock } from "./product-stock";
 
 interface ProductsTableProps {
   products: Product[];
@@ -60,7 +61,7 @@ export function ProductsTable({ products, meta, isLoading, onPageChange, onView,
     },
     {
       title: "Stock", dataIndex: "totalStock", key: "totalStock",
-      render: (stock: number) => <span className="text-xs text-foreground">{stock.toLocaleString("en-IN")}</span>,
+      render: (stock: number, product) => <ProductStock stock={stock} showStatus={product.variantCount > 0} />,
     },
     {
       title: "Materials",

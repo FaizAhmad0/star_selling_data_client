@@ -1,6 +1,10 @@
-import { apiGet, apiPost } from "@/lib/axios";
+import { apiGet, apiPatch, apiPost } from "@/lib/axios";
 import type { ApiResponse } from "@/types/api";
-import type { ProductImportResult, ProductImportRow, ProductListResponse, ProductQueryParams } from "../types";
+import type { ProductImportResult, ProductImportRow, ProductListResponse, ProductQueryParams, UpdateProductStockInput, UpdateProductStockResponse } from "../types";
+
+export function updateProductVariantStock({ productId, variantId, stock }: UpdateProductStockInput) {
+  return apiPatch<UpdateProductStockResponse>(`/products/${productId}/variants/${variantId}/stock`, { stock });
+}
 
 export function getProducts(params: ProductQueryParams = {}, signal?: AbortSignal) {
   const query = new URLSearchParams();

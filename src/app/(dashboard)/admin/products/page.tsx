@@ -8,6 +8,7 @@ import { ErrorState } from "@/components/shared/error-state";
 import { UsersFilter } from "@/features/users/components/users-filter";
 import { ProductsTable } from "@/features/products/components/products-data-table";
 import { ProductModal } from "@/features/products/components/product-modal";
+import { EditProductStockModal } from "@/features/products/components/edit-product-stock-modal";
 import { BulkImportProductsModal } from "@/features/products/components/bulk-import-products-modal";
 import { useProducts } from "@/features/products/hooks/use-products";
 import type { Product } from "@/features/products/types";
@@ -21,6 +22,7 @@ export default function AdminProductsPage() {
   const [page, setPage] = useState(1);
   const [isBulkImportOpen, setIsBulkImportOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const limit = 10;
 
   useEffect(() => {
@@ -122,11 +124,15 @@ export default function AdminProductsPage() {
           isLoading={isLoading || isFetching}
           onPageChange={setPage}
           onView={setSelectedProduct}
+          onEdit={setEditingProduct}
         />
       )}
 
       {selectedProduct && (
         <ProductModal product={selectedProduct} readOnly onClose={() => setSelectedProduct(null)} />
+      )}
+      {editingProduct && (
+        <EditProductStockModal key={editingProduct._id} product={editingProduct} onClose={() => setEditingProduct(null)} />
       )}
       {isBulkImportOpen && (
         <BulkImportProductsModal onClose={() => setIsBulkImportOpen(false)} onDownloadSample={handleDownloadSample} />

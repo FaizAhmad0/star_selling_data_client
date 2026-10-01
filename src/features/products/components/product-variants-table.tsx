@@ -3,6 +3,7 @@
 import { Table } from "antd";
 import type { TableProps } from "antd";
 import type { Product, ProductVariant } from "../types";
+import { ProductStock } from "./product-stock";
 
 type VariantRow = ProductVariant & { color: string };
 const price = (value: number | null) => value == null ? "—" : value.toLocaleString("en-IN", { maximumFractionDigits: 2 });
@@ -11,7 +12,7 @@ const columns: TableProps<VariantRow>["columns"] = [
   { title: "SKU", dataIndex: "sku", key: "sku", width: 180 },
   { title: "Color", dataIndex: "color", key: "color" },
   { title: "Size", dataIndex: "size", key: "size" },
-  { title: "Stock", dataIndex: "stock", key: "stock" },
+  { title: "Stock", dataIndex: "stock", key: "stock", render: (stock: number) => <ProductStock stock={stock} /> },
   {
     title: "Dimensions (L × W × H)", key: "dimensions",
     render: (_, variant) => [variant.dimensions?.length, variant.dimensions?.width, variant.dimensions?.height].map((value) => value ?? "—").join(" × "),

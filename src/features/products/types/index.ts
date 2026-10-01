@@ -50,6 +50,14 @@ export interface ProductQueryParams {
 
 export type ProductListResponse = ApiResponse<PaginatedResponse<Product>>;
 
+export interface UpdateProductStockInput {
+  productId: string;
+  variantId: string;
+  stock: number;
+}
+
+export type UpdateProductStockResponse = ApiResponse<{ productId: string; variant: ProductVariant }>;
+
 export type ProductImportCell = string | number | boolean | null;
 
 export interface ProductImportRow {
